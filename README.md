@@ -29,6 +29,7 @@ Skin cancer is one of the most common cancers worldwide, and early detection sig
 - Train/Validation/Test Split : 70/20/10
 
 ## Project Structure
+
 ```bash
 skin-lesion-classifier/
 ├── model/             # Model loading & checkpoint
@@ -83,5 +84,4 @@ Evaluation: accuracy, precision, recall, confusion matrix, GradCAM, etc
 ## Credits
 
 **Mentors & resources** :
-
 
