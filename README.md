@@ -1,14 +1,8 @@
 # Skin Lesion Classifier
-
 A custom image classification project using **PyTorch**, **FastAPI**, and **Streamlit** using transfer learning (ResNet50) to detect and classify different types of skin lesions, including malignant and benign ones, with high accuracy.
 
----
-
 ## Problem Statement
-
 Skin cancer is one of the most common cancers worldwide, and early detection significantly improves survival rates. However, access to dermatologists is limited in many parts of the world. An automated image classification system could help triage cases and support medical professionals with faster diagnoses.
-
----
 
 ## Dataset Description
 
@@ -34,13 +28,21 @@ Skin cancer is one of the most common cancers worldwide, and early detection sig
 - Image size : Original 600 x 450, resized to 224 x 224 for ResNet
 - Train/Validation/Test Split : 70/20/10
 
----
-
 ## Project Structure
-
-skin-lesion-classifier/ ├── model/             # Model loading & checkpoint ├── api/               # FastAPI service ├── streamlit_app/     # Streamlit demo UI ├── Dockerfile         # Optional containerization ├── README.md └── .gitignore
-
----
+```bash
+skin-lesion-classifier/
+├── model/             # Model loading & checkpoint
+│   └── model.py
+├── api/               # FastAPI service
+│   ├── app.py
+│   ├── utils.py
+│   └── requirements.txt
+├── streamlit_app/     # Streamlit demo UI
+│   └── app.py
+├── Dockerfile         # Optional containerization
+├── README.md
+└── .gitignore
+```
 
 ## Features
 
@@ -51,13 +53,9 @@ skin-lesion-classifier/ ├── model/             # Model loading & checkpoin
 - Optional Streamlit UI for demos
 - Docker-ready
 
----
-
 ## How to Train
 
-Coming soon: training script + model checkpoint instructions
-
----
+Coming soon: 
 
 ## How to Use the API
 
@@ -70,13 +68,9 @@ Then POST an image to:
 
 http://localhost:8000/predict
 
----
-
 ## Metrics
 
 Evaluation: accuracy, precision, recall, confusion matrix, GradCAM, etc
-
----
 
 ## Tech Stack
 
@@ -86,11 +80,8 @@ Evaluation: accuracy, precision, recall, confusion matrix, GradCAM, etc
 - Streamlit
 - Docker 
 
----
-
 ## Credits
 
 **Mentors & resources** :
-
 
 
