@@ -1,0 +1,33 @@
+seed: 42
+
+data:
+  train_dir: data/train
+  val_dir: data/val
+  test_dir: data/test
+  num_workers: 4
+  img_size: 224
+  class_names: ["akiec", "bcc", "bkl", "df", "mel", "nv", "vasc"]
+
+model:
+  name: resnet18
+  num_classes: 7
+  pretrained: true
+
+train:
+  batch_size: 32
+  epochs: 15
+  lr: 0.001
+  weight_decay: 0.0001
+  use_class_weights: true
+  scheduler: step
+  step_size: 5
+  gamma: 0.1
+  early_stopping_patience: 3
+  checkpoint_dir: models
+  checkpoint_name: resnet18_best.pt
+
+eval:
+  outputs_dir: outputs
+  save_cm_png: true
+  cm_png_name: confusion_matrix.png
+  report_txt_name: metrics_report.txt
