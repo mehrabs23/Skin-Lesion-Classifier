@@ -4,3 +4,5 @@ __pycache__/
 .env
 .DS_Store
 *.log
+HAM10000_metadata.csv
+HAM10000_images
