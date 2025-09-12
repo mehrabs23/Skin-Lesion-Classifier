@@ -1,8 +1,52 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pth
-*.ipynb_checkpoints
-.env
-.DS_Store
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+.venv.bak/
+
+# VS Code & PyCharm settings
+.vscode/
+.idea/
+
+# Logs
 *.log
-HAM10000_metadata.csv
-HAM10000_images
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+
+# Mac/Linux metadata
+*.swp
+*~
+
+# Python dependency files
+*.egg-info/
+.eggs/
+
+# Model artifacts
+*.pt
+*.pth
+*.onnx
+*.h5
+
+# Data folders (we don't push datasets to GitHub)
+data/train/
+data/val/
+data/test/
+assets/
+
+# Optional: ignore large CSV or ZIP files even inside assets
+*.csv
+*.zip
+
+# Results/outputs
+outputs/
