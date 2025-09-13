@@ -5,10 +5,10 @@ import random
 import numpy as np
 import torch
 import yaml
+from collections import Counter
+from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support
 import matplotlib.pyplot as plt
 import seaborn as sns
-from collections import Counter
-from sklearn.metrics import classification_report, confusion_matrix
 
 
 def load_config(path="config.yaml"):
@@ -41,26 +41,24 @@ def compute_class_weights(imagefolder_dataset, class_names):
     return weights, totals
 
 
-def calculate_metrics(y_true, y_pred, target_names):
+def calculate_metrics(y_true, y_pred, class_names):
     """
-    Print classification report and return as dict.
+    Calculate precision, recall, f1, and support for each class.
     """
-    report = classification_report(y_true, y_pred, target_names=target_names, output_dict=True)
-    print("\nClassification Report:")
-    print(classification_report(y_true, y_pred, target_names=target_names))
-    return report
+    precision, recall, f1, support = precision_recall_fscore_support(y_true, y_pred, labels=range(len(class_names)))
+    return precision, recall, f1, support
 
 
-def plot_confusion_matrix(y_true, y_pred, target_names, save_path):
+def plot_confusion_matrix(y_true, y_pred, class_names, output_path):
     """
-    Plot and save confusion matrix.
+    Plot and save a confusion matrix.
     """
     cm = confusion_matrix(y_true, y_pred)
     plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=target_names, yticklabels=target_names)
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    plt.title('Confusion Matrix')
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
+    plt.xlabel("Predicted")
+    plt.ylabel("True")
+    plt.title("Confusion Matrix")
     plt.tight_layout()
-    plt.savefig(save_path)
+    plt.savefig(output_path)
     plt.close()

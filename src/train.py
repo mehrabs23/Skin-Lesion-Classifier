@@ -1,5 +1,4 @@
 # src/train.py
-
 import os
 import torch
 import torch.nn as nn
@@ -7,14 +6,12 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score
-
-from src.dataset import get_dataloaders
-from src.utils import load_config, set_seed, compute_class_weights
-from model.model import get_model, save_checkpoint
+from src.dataset import get_dataloaders  # type: ignore
+from src.utils import load_config, set_seed, compute_class_weights, calculate_metrics, plot_confusion_matrix  # type: ignore
+from model.model import get_model, save_checkpoint  # type: ignore
 from torchvision import datasets, transforms
 
-
-def validate(model, loader, device):
+def validate(model, loader, device, class_names, epoch=None, output_dir=None):
     model.eval()
     y_true, y_pred = [], []
     val_loss = 0.0
@@ -27,15 +24,26 @@ def validate(model, loader, device):
             val_loss += loss.item() * x.size(0)
             y_true.extend(y.cpu().numpy())
             y_pred.extend(torch.argmax(logits, dim=1).cpu().numpy())
+
     val_loss /= len(loader.dataset)
     val_acc = accuracy_score(y_true, y_pred)
-    return val_loss, val_acc
 
+    # Compute and log detailed metrics
+    precision, recall, f1, support = calculate_metrics(y_true, y_pred, class_names)
+    print("\nValidation Metrics:")
+    for i, cls in enumerate(class_names):
+        print(f"  {cls}: Precision={precision[i]:.2f}, Recall={recall[i]:.2f}, F1={f1[i]:.2f}, Support={support[i]}")
+    print(f"  Overall Val Acc: {val_acc:.4f} | Val Loss: {val_loss:.4f}")
+
+    # Plot and save confusion matrix
+    if output_dir and epoch:
+        plot_confusion_matrix(y_true, y_pred, class_names, output_path=os.path.join(output_dir, f"confmat_epoch{epoch}.png"))
+
+    return val_loss, val_acc  
 
 def main():
     cfg = load_config("config.yaml")
     set_seed(cfg["seed"])
-
     device = "cuda" if torch.cuda.is_available() else "cpu"
     os.makedirs(cfg["train"]["checkpoint_dir"], exist_ok=True)
     os.makedirs(cfg["eval"]["outputs_dir"], exist_ok=True)
@@ -69,6 +77,11 @@ def main():
     patience = cfg["train"]["early_stopping_patience"]
     no_improve = 0
 
+    print("Run ID: exp-002")
+    print("Model: ResNet50")
+    print("Layers unfrozen: layer3, layer4, fc")
+    print("LR: 1e-4 | Epochs: 10")
+
     for epoch in range(1, cfg["train"]["epochs"] + 1):
         model.train()
         running_loss = 0.0
@@ -84,9 +97,10 @@ def main():
             pbar.set_postfix(loss=loss.item())
 
         train_loss = running_loss / len(train_loader.dataset)
-        val_loss, val_acc = validate(model, val_loader, device)
+        val_loss, val_acc = validate(model, val_loader, device, classes, epoch, output_dir=cfg["eval"]["outputs_dir"])
 
-        if sched: sched.step()
+        if sched:
+            sched.step()
 
         print(f"[Epoch {epoch}] Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}")
 
@@ -103,6 +117,6 @@ def main():
                 print("⏹️ Early stopping triggered.")
                 break
 
-
 if __name__ == "__main__":
     main()
+
