@@ -10,3 +10,4 @@ Pillow
 fastapi
 uvicorn
 wandb
+seaborn
