@@ -5,18 +5,15 @@ import random
 import numpy as np
 import torch
 import yaml
+import matplotlib.pyplot as plt
+import seaborn as sns
 from collections import Counter
+from sklearn.metrics import classification_report, confusion_matrix
 
 
 def load_config(path="config.yaml"):
     """
     Loads a YAML config file.
-
-    Args:
-        path (str): Path to config file
-
-    Returns:
-        dict: Parsed configuration
     """
     with open(path, "r") as f:
         return yaml.safe_load(f)
@@ -25,9 +22,6 @@ def load_config(path="config.yaml"):
 def set_seed(seed=42):
     """
     Sets random seed for reproducibility.
-
-    Args:
-        seed (int): Seed value
     """
     random.seed(seed)
     np.random.seed(seed)
@@ -38,14 +32,6 @@ def set_seed(seed=42):
 def compute_class_weights(imagefolder_dataset, class_names):
     """
     Compute inverse-frequency class weights.
-
-    Args:
-        imagefolder_dataset: PyTorch ImageFolder dataset
-        class_names (List[str]): Names of classes in order
-
-    Returns:
-        torch.Tensor: Normalized class weights
-        List[int]: Sample counts per class
     """
     counts = Counter(imagefolder_dataset.targets)
     totals = [counts[i] for i in range(len(class_names))]
@@ -53,3 +39,28 @@ def compute_class_weights(imagefolder_dataset, class_names):
     weights = torch.tensor(inv, dtype=torch.float)
     weights = weights * (len(inv) / (weights.sum() + 1e-8))  # normalize
     return weights, totals
+
+
+def calculate_metrics(y_true, y_pred, target_names):
+    """
+    Print classification report and return as dict.
+    """
+    report = classification_report(y_true, y_pred, target_names=target_names, output_dict=True)
+    print("\nClassification Report:")
+    print(classification_report(y_true, y_pred, target_names=target_names))
+    return report
+
+
+def plot_confusion_matrix(y_true, y_pred, target_names, save_path):
+    """
+    Plot and save confusion matrix.
+    """
+    cm = confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=target_names, yticklabels=target_names)
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title('Confusion Matrix')
+    plt.tight_layout()
+    plt.savefig(save_path)
+    plt.close()
