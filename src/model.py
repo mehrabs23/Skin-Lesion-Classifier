@@ -6,6 +6,7 @@ from torchvision import models
 def get_model(model_name="resnet50", num_classes=7, pretrained=True):
     """
     Load a pretrained CNN (resnet18 or resnet50) and replace the final layer.
+    Matches saved checkpoint architecture (single linear fc layer).
     """
     if model_name == "resnet18":
         m = models.resnet18(weights=models.ResNet18_Weights.DEFAULT if pretrained else None)
@@ -14,7 +15,7 @@ def get_model(model_name="resnet50", num_classes=7, pretrained=True):
     else:
         raise ValueError(f"Unsupported model: {model_name}")
 
-    # Freeze all layers first
+    # Freeze all layers
     for param in m.parameters():
         param.requires_grad = False
 
@@ -24,14 +25,11 @@ def get_model(model_name="resnet50", num_classes=7, pretrained=True):
     for param in m.layer4.parameters():
         param.requires_grad = True
 
-    # Replace and unfreeze the classifier (fc)
+    # Replace final classification layer with a single Linear layer
     in_features = m.fc.in_features
-    m.fc = nn.Sequential(
-        nn.Linear(in_features, 512),
-        nn.ReLU(),
-        nn.Dropout(0.3),
-        nn.Linear(512, num_classes)
-    )
+    m.fc = nn.Linear(in_features, num_classes)  # ✅ Match checkpoint architecture
+
+    # Unfreeze the fc layer
     for param in m.fc.parameters():
         param.requires_grad = True
 
